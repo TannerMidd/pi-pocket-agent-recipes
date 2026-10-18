@@ -1,6 +1,16 @@
+.ar-surface {
+    container: ar-workbench / inline-size;
+    width: 100%;
+    max-width: 1440px;
+    height: 100%;
+    min-height: 0;
+    margin: 0 auto;
+    font: inherit;
+    font-size: max(14px, 1em);
+}
+
 .ar-root {
     width: 100%;
-    max-width: 1060px;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -10,8 +20,8 @@
     padding: 0 0 8px;
     color: var(--text);
     background: var(--bg);
-    font-size: 13px;
-    line-height: 1.45;
+    font-size: inherit;
+    line-height: 1.5;
     overflow-wrap: anywhere;
 }
 
@@ -29,13 +39,13 @@
 }
 
 .ar-root h2 {
-    font-size: 15px;
+    font-size: 1.15em;
     font-weight: 600;
 }
 
 .ar-root h3,
 .ar-root h4 {
-    font-size: 13px;
+    font-size: 1em;
     font-weight: 600;
 }
 
@@ -83,8 +93,8 @@
 }
 
 .ar-root .button {
-    min-height: 30px;
-    padding: 5px 10px;
+    min-height: 36px;
+    padding: 6px 12px;
     border-radius: 5px;
     font: inherit;
     font-weight: 550;
@@ -119,7 +129,7 @@
 
 .ar-workspace {
     display: grid;
-    grid-template-columns: minmax(200px, 245px) minmax(0, 1fr);
+    grid-template-columns: minmax(240px, 23%) minmax(0, 1fr);
     border-top: 1px solid var(--line);
     flex: 1;
     min-height: 0;
@@ -148,7 +158,7 @@
     gap: 5px;
     min-width: 0;
     color: var(--text);
-    font-size: 12px;
+    font-size: 1em;
     font-weight: 550;
 }
 
@@ -169,7 +179,7 @@
     background: var(--bg);
     color: var(--text);
     font: inherit;
-    font-size: 13px;
+    font-size: 1em;
     font-weight: 400;
     line-height: 1.5;
 }
@@ -229,7 +239,7 @@
 }
 
 .ar-item strong {
-    font-size: 13px;
+    font-size: 1em;
     font-weight: 550;
 }
 
@@ -237,13 +247,20 @@
 .ar-item small {
     margin-top: 2px;
     color: var(--muted);
-    font-size: 11px;
+    font-size: 0.925em;
 }
 
 .ar-editor,
 .ar-run-detail {
     min-width: 0;
-    padding: 12px 0 0 20px;
+    padding: 16px 0 0 24px;
+}
+
+.ar-run-target,
+.ar-context p,
+.ar-status-role,
+.ar-role-body {
+    max-width: 92ch;
 }
 
 .ar-pane {
@@ -264,7 +281,7 @@
 
 .ar-save-state {
     color: var(--muted);
-    font-size: 11px;
+    font-size: 0.925em;
 }
 
 .ar-recipe-tools {
@@ -285,7 +302,7 @@
 .ar-recipe-fields,
 .ar-model-fields {
     display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(120px, 1fr);
+    grid-template-columns: minmax(0, 1.6fr) minmax(170px, 1fr);
     gap: 10px;
 }
 
@@ -295,7 +312,7 @@
 
 .ar-root .ar-field-error {
     color: var(--err);
-    font-size: 12px;
+    font-size: 0.95em;
     font-weight: 400;
 }
 
@@ -306,7 +323,7 @@
 
 .ar-root .ar-mode-note {
     color: var(--muted);
-    font-size: 11px;
+    font-size: 0.925em;
     margin: 10px 0 18px;
     max-width: 68ch;
 }
@@ -359,19 +376,19 @@
 }
 
 .ar-role-head strong {
-    font-size: 13px;
+    font-size: 1em;
     font-weight: 550;
 }
 
 .ar-role-head small {
     color: var(--muted);
-    font-size: 11px;
+    font-size: 0.925em;
     margin-top: 2px;
 }
 
 .ar-role-number {
     color: var(--muted);
-    font-size: 11px;
+    font-size: 0.925em;
     width: 16px;
     flex-shrink: 0;
     text-align: center;
@@ -380,7 +397,7 @@
 
 .ar-chevron {
     color: var(--muted);
-    font-size: 18px;
+    font-size: 1.3em;
     font-weight: 400;
     margin-left: auto;
 }
@@ -406,19 +423,19 @@
 }
 
 .ar-editor-footer > .ar-muted {
-    font-size: 11px;
+    font-size: 0.925em;
 }
 
 .ar-root .ar-muted,
 .ar-label {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 0.95em;
     font-weight: 400;
 }
 
 .ar-label {
     display: block;
-    font-size: 11px;
+    font-size: 0.925em;
     margin-bottom: 3px;
 }
 
@@ -430,7 +447,7 @@
     padding: 8px 10px;
     border-left: 2px solid var(--err);
     background: var(--card);
-    font-size: 12px;
+    font-size: 0.95em;
 }
 
 .ar-alert {
@@ -457,7 +474,7 @@
 .ar-empty {
     padding: 20px 10px;
     color: var(--muted);
-    font-size: 12px;
+    font-size: 0.95em;
 }
 
 .ar-empty .button {
@@ -472,7 +489,7 @@
     width: 100%;
     flex: 1;
     min-height: 0;
-    max-width: 680px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 14px 0;
     border-top: 1px solid var(--line);
@@ -492,20 +509,20 @@
 
 .ar-source strong,
 .ar-runs-source strong {
-    font-size: 13px;
+    font-size: 1em;
     font-weight: 550;
 }
 
 .ar-source small {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 0.95em;
     margin-top: 5px;
 }
 
 .ar-path {
     color: var(--muted);
     font-family: ui-monospace, monospace;
-    font-size: 11px;
+    font-size: 0.925em;
     margin-top: 2px;
     overflow-wrap: anywhere;
 }
@@ -555,20 +572,20 @@
 }
 
 .ar-run-role-summary strong {
-    font-size: 13px;
+    font-size: 1em;
     font-weight: 550;
 }
 
 .ar-run-role-summary small {
     margin-top: 2px;
     color: var(--muted);
-    font-size: 11px;
+    font-size: 0.925em;
 }
 
 .ar-needs-setup {
     flex-shrink: 0;
     color: var(--warn);
-    font-size: 11px;
+    font-size: 0.925em;
 }
 
 .ar-run-role[open] > summary .ar-chevron {
@@ -602,7 +619,7 @@
 }
 
 .ar-runs-source > .ar-muted {
-    font-size: 11px;
+    font-size: 0.925em;
 }
 
 .ar-runs-workspace {
@@ -611,7 +628,7 @@
 
 .ar-status {
     color: var(--muted);
-    font-size: 11px;
+    font-size: 0.925em;
     font-weight: 400;
 }
 
@@ -630,7 +647,7 @@
 
 .ar-context summary {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 0.95em;
     cursor: pointer;
 }
 
@@ -689,6 +706,237 @@
     border: 0;
 }
 
+.ar-assistant {
+    flex: none;
+    min-height: 0;
+    max-height: 48%;
+    margin-bottom: 12px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+}
+
+.ar-assistant > summary {
+    padding: 10px 0;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.ar-assistant > summary .ar-muted {
+    margin-left: 8px;
+}
+
+.ar-assistant-body {
+    display: grid;
+    gap: 12px;
+    padding-bottom: 14px;
+}
+
+.ar-assistant-body > p {
+    max-width: 94ch;
+}
+
+.ar-assistant-heading,
+.ar-policy-toggle,
+.ar-policy-switch,
+.ar-policy-actions,
+.ar-review-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+}
+
+.ar-policy-toggle > :first-child {
+    flex: 1;
+}
+
+.ar-policy-toggle > :last-child,
+.ar-policy-switch > :last-child {
+    flex-shrink: 0;
+}
+
+.ar-policy-toggle p {
+    margin-top: 4px;
+}
+
+.ar-sharing-list {
+    border-top: 1px solid var(--line);
+}
+
+.ar-sharing-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) auto auto;
+    align-items: center;
+    gap: 10px 24px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.ar-sharing-title strong,
+.ar-sharing-title span {
+    display: block;
+}
+
+.ar-sharing-title span {
+    margin-top: 2px;
+}
+
+.ar-root .ar-count-limit {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    grid-column: 1 / -1;
+}
+
+.ar-count-limit input {
+    width: 80px;
+}
+
+.ar-snapshot-update {
+    grid-column: 1 / -1;
+    min-width: 0;
+}
+
+.ar-snapshot-update > summary {
+    color: var(--warn);
+    cursor: pointer;
+}
+
+.ar-snapshot-update > .ar-snapshot {
+    margin-top: 12px;
+}
+
+.ar-snapshot-update > .button {
+    margin-top: 12px;
+    white-space: normal;
+}
+
+.ar-assistant-body > .ar-mode-note {
+    margin: 0;
+    max-width: 94ch;
+}
+
+.ar-policy-actions,
+.ar-review-actions {
+    justify-content: end;
+    flex-wrap: wrap;
+}
+
+.ar-review-surface {
+    container: ar-review / inline-size;
+    min-width: 0;
+    font: inherit;
+    font-size: max(14px, 1em);
+}
+
+.ar-review.ar-root {
+    height: auto;
+    overflow: visible;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+.ar-review-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-height: 160px;
+    margin-bottom: 14px;
+    overflow-y: auto;
+}
+
+.ar-review-list .button {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ar-review-list [aria-pressed="true"] {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.ar-review-content > h3,
+.ar-review-content > .ar-snapshot {
+    margin-top: 18px;
+}
+
+.ar-review-task,
+.ar-snapshot-role p {
+    max-width: 92ch;
+    margin-top: 8px;
+    white-space: pre-wrap;
+}
+
+.ar-snapshot-role {
+    border-top: 1px solid var(--line);
+    padding: 10px 0;
+}
+
+.ar-snapshot-role:last-child {
+    border-bottom: 1px solid var(--line);
+}
+
+.ar-snapshot-role summary {
+    cursor: pointer;
+}
+
+.ar-snapshot-role summary .ar-muted {
+    display: block;
+    margin-top: 4px;
+}
+
+.ar-snapshot-role p {
+    padding: 8px 0;
+}
+
+.ar-review-content .ar-policy-toggle,
+.ar-review-actions {
+    margin-top: 16px;
+    margin-bottom: 12px;
+}
+
+.ar-draft-changes {
+    margin: 16px 0;
+}
+
+.ar-draft-changes > h3 {
+    margin-bottom: 8px;
+}
+
+.ar-change {
+    border-top: 1px solid var(--line);
+    padding: 10px 0;
+}
+
+.ar-change > summary {
+    cursor: pointer;
+}
+
+.ar-change-pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+    padding: 12px 0 4px;
+}
+
+.ar-change-pair p {
+    white-space: pre-wrap;
+}
+
+@container ar-review (max-width: 560px) {
+    .ar-change-pair {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .ar-review .button {
+        min-height: 40px;
+        white-space: normal;
+    }
+}
+
 @media (hover: hover) {
     .ar-item:not(:disabled):hover,
     .ar-role-head:not(:disabled):hover,
@@ -697,10 +945,26 @@
     }
 }
 
-@media (max-width: 699px) {
+@container ar-workbench (max-width: 760px) {
     .ar-root {
         padding: 0 0 8px;
-        font-size: 14px;
+    }
+
+    .ar-assistant-heading {
+        flex-wrap: wrap;
+    }
+
+    .ar-sharing-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .ar-policy-switch {
+        justify-content: space-between;
+    }
+
+    .ar-policy-actions .button {
+        white-space: normal;
     }
 
     .ar-header {
@@ -732,7 +996,7 @@
     }
 
     .ar-root label {
-        font-size: 12px;
+        font-size: 1em;
     }
 
     .ar-workspace {
@@ -770,12 +1034,12 @@
     }
 
     .ar-item strong {
-        font-size: 14px;
+        font-size: 1em;
     }
 
     .ar-item span,
     .ar-item small {
-        font-size: 12px;
+        font-size: 0.95em;
     }
 
     .ar-editor,
@@ -817,7 +1081,6 @@
     .ar-root .ar-recipe-tools .button {
         padding-right: 6px;
         padding-left: 6px;
-        font-size: 12px;
     }
 
     .ar-recipe-fields {
@@ -826,7 +1089,7 @@
     }
 
     .ar-root .ar-mode-note {
-        font-size: 12px;
+        font-size: 0.95em;
         margin-bottom: 12px;
     }
 
@@ -836,11 +1099,11 @@
     }
 
     .ar-role-head strong {
-        font-size: 14px;
+        font-size: 1em;
     }
 
     .ar-role-head small {
-        font-size: 12px;
+        font-size: 0.95em;
     }
 
     .ar-screen-editor .ar-role-body {
