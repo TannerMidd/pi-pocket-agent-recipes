@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { createSession, MemoryStorage } from "@earendil-works/pi-durable";
-import type { ConversationId } from "@earendil-works/pi-durable";
+import type { ConversationId, ToolExecutionApi } from "@earendil-works/pi-durable";
 import type {
     ConversationWebRequest,
     Host,
@@ -12,7 +12,7 @@ import type {
     WebHandler,
     WebRequest,
 } from "../_pocket.d.ts";
-import setup from "../agent-recipes.ts";
+import setup, { Assistant } from "../agent-recipes.ts";
 import { Catalog, Launches, RETRY_WINDOW, parseRecipe, seeds } from "../agent-recipes/domain.ts";
 import type { LaunchRequest } from "../agent-recipes/domain.ts";
 
@@ -37,6 +37,9 @@ async function fixture(unsupported = false) {
         thinking?: string;
     }[] = [];
     const receipts = new Map<string, { session: ConversationId; address: string }>();
+    const events: { event: string; data: unknown; to?: string }[] = [];
+    const actors: string[] = [];
+    let requester = "guest";
     let allowed = ["local/reviewer", "local/basic"];
     let startCalls = 0;
     let failResultForRole = 0;
@@ -96,7 +99,19 @@ async function fixture(unsupported = false) {
         },
         resolveModel: (spec: string) => ({ provider: "local", modelId: spec.slice(6) }),
         subagentModels: () => allowed,
-        requesterOf: () => "guest",
+        requesterOf: () => requester,
+        linkedSessions: {
+            start: async (
+                _source: ConversationId,
+                request: Parameters<HumanLinkedSessions["start"]>[0],
+                key: string,
+            ) => {
+                actors.push(requester);
+
+                return linked.start(request, key);
+            },
+            list: async () => (await linked.list()).map(({ conversationId: _id, ...item }) => item),
+        },
         text: {
             defang: (text: string) => text.replaceAll("</", "<∕"),
             quoted: (text: string) => JSON.stringify(text),
@@ -112,6 +127,8 @@ async function fixture(unsupported = false) {
         client: (_entry: string, options: { access: string }) =>
             assert.equal(options.access, "owner"),
         route: register,
+        send: (event: string, data: unknown, options?: { to?: string }) =>
+            events.push({ event, data, ...options }),
         ...(!unsupported && { conversationRoute: register }),
         error: (status: number, message: string) => Object.assign(new Error(message), { status }),
     } as unknown as Web;
@@ -166,9 +183,40 @@ async function fixture(unsupported = false) {
         source,
         children,
         receipts,
+        events,
+        actors,
         routes,
         call,
         request,
+        async tool(name: string, args: Record<string, unknown> = {}, key = name) {
+            const api = {
+                conversationId: source,
+                taskId: key,
+                callId: key,
+                snapshot: session.snapshot.bind(session),
+                commit: (change: Parameters<WebRequest["commit"]>[0]) => commit(change),
+                agent: async () => ({
+                    cwd: sourceSettings.cwd,
+                    model: sourceSettings.model,
+                    thinkingLevel: sourceSettings.thinkingLevel,
+                }),
+            } as unknown as ToolExecutionApi;
+            const result = await extension
+                .tools!.find((tool) => tool.name === name)!
+                .execute(args, api, context);
+            const output = result.content?.find((item) => item.type === "text");
+
+            return JSON.parse(
+                output && output.type === "text"
+                    ? output.text
+                          .split("<agent-recipes-data>\n")[1]
+                          .split("\n</agent-recipes-data>")[0]
+                    : "null",
+            );
+        },
+        requester(value: string) {
+            requester = value;
+        },
         get tools() {
             return extension.tools!;
         },
@@ -197,7 +245,7 @@ async function fixture(unsupported = false) {
     };
 }
 
-test("owner-only direct routes are source-bound; model tools cannot approve or start runs", async () => {
+test("owner-only routes are source-bound; model tools see only shared snapshots and save local drafts", async () => {
     const f = await fixture();
     const old = await fixture(true);
 
@@ -212,9 +260,55 @@ test("owner-only direct routes are source-bound; model tools cannot approve or s
         );
         assert.deepEqual(
             f.tools.map((tool) => tool.name),
-            ["agent_recipes_status"],
+            [
+                "agent_recipes_list",
+                "agent_recipes_get",
+                "agent_recipes_draft",
+                "agent_recipes_invoke",
+                "agent_recipes_status",
+            ],
         );
         assert.equal((await f.call("GET state")).supported, true);
+        assert.equal((await f.call("GET state")).version, "0.3.0");
+        assert.equal((await f.call("GET state")).assistantSupported, true);
+        assert.deepEqual(await f.tool("agent_recipes_list"), { recipes: [], drafts: [] });
+        await assert.rejects(
+            f.tool("agent_recipes_invoke", { recipe: "review-branch", target: "Not shared" }),
+            /not shared/,
+        );
+        const { revision: _revision, ...draftRecipe } = parseRecipe({
+            ...seeds[0],
+            id: "draft-review",
+        });
+        const draft = await f.tool("agent_recipes_draft", { recipe: draftRecipe });
+
+        await f.tool("agent_recipes_draft", { recipe: draftRecipe }); // Same call is a receipt, not a second draft.
+        assert.equal((await f.call("POST sources/:source/assistant")).drafts.length, 1);
+        assert.equal(draft.revision, 1);
+        const listedDraft = (await f.tool("agent_recipes_list")).drafts[0];
+
+        assert.equal(listedDraft.id, draft.draftId);
+        assert.equal(
+            (await f.tool("agent_recipes_get", { draft: listedDraft.id })).draft.recipe.id,
+            "draft-review",
+        );
+        assert.equal(
+            (await f.tool("agent_recipes_get", { draft: listedDraft.title })).draft.revision,
+            1,
+        );
+        assert.equal((await f.call("GET state")).recipes.length, 3);
+        assert.equal(
+            (await f.session.snapshot(Assistant, f.source, context))!.policy.enabled,
+            false,
+        );
+        assert.ok(
+            f.events.every(
+                ({ event, data }) =>
+                    event === "assistant-changed" &&
+                    JSON.stringify(data) === JSON.stringify({ source: String(f.source) }),
+            ),
+        );
+        assert.equal(f.startCalls, 0);
         await assert.rejects(
             f.call("POST sources/:source/launches", f.request(), {
                 linkedSessions: {} as HumanLinkedSessions,
@@ -421,6 +515,110 @@ test("global recipe edits and deletion are revision-checked; immutable runs surv
                 .title,
             "Updated review",
         );
+        const { revision: _revision, ...recipeDraft } = parseRecipe({
+            ...seeds[0],
+            id: "from-conversation",
+            roles: [seeds[0].roles[0]],
+        });
+        const draft = await f.tool("agent_recipes_draft", { recipe: recipeDraft });
+        const updated = await f.tool(
+            "agent_recipes_draft",
+            {
+                recipe: { ...recipeDraft, title: "Accepted draft" },
+                draft: draft.draftId,
+                revision: 1,
+            },
+            "draft-edit",
+        );
+        const draftParams = { source: String(f.source), draft: draft.draftId };
+
+        await assert.rejects(
+            f.call(
+                "POST sources/:source/assistant/drafts/:draft/accept",
+                { revision: 1, share: true },
+                { params: draftParams },
+            ),
+            { status: 409 },
+        );
+        const accepted = await f.call(
+            "POST sources/:source/assistant/drafts/:draft/accept",
+            { revision: updated.revision, share: true },
+            { params: draftParams },
+        );
+
+        assert.equal(accepted.recipe.revision, 1);
+        assert.equal(accepted.policy.enabled, false);
+        assert.equal(accepted.policy.revision, 1);
+        await assert.rejects(
+            f.call("POST sources/:source/assistant/policy", {
+                revision: 0,
+                enabled: false,
+                shared: [],
+                grants: [],
+            }),
+            { status: 409 },
+        );
+        assert.equal(
+            (await f.tool("agent_recipes_get", { recipe: "Accepted draft" })).recipe.id,
+            recipeDraft.id,
+        );
+        const proposal = await f.tool("agent_recipes_invoke", {
+            recipe: recipeDraft.id,
+            target: "Review the branch",
+        });
+
+        assert.equal(proposal.status, "needs-owner-confirmation");
+        assert.equal(f.startCalls, 3);
+        const edit = await f.tool(
+            "agent_recipes_draft",
+            { recipe: { ...recipeDraft, title: "Replacement" }, baseRevision: 1 },
+            "based-draft",
+        );
+
+        await f.call("POST recipes", {
+            recipe: { ...accepted.recipe, title: "Catalog changed after preview" },
+        });
+        await assert.rejects(
+            f.call(
+                "POST sources/:source/assistant/drafts/:draft/accept",
+                { revision: edit.revision, share: true },
+                { params: { source: String(f.source), draft: edit.draftId } },
+            ),
+            { status: 409 },
+        );
+        const proposalParams = { source: String(f.source), proposal: proposal.proposal };
+        const started = await f.call(
+            "POST sources/:source/assistant/proposals/:proposal/start",
+            { revision: proposal.revision },
+            { params: proposalParams },
+        );
+
+        assert.equal(started.launch.title, "Accepted draft"); // Exact shared snapshot survives catalog edits.
+        assert.equal(started.launch.mode, "human");
+        await f.call(
+            "POST sources/:source/assistant/proposals/:proposal/start",
+            { revision: proposal.revision },
+            { params: proposalParams },
+        );
+        assert.equal(f.startCalls, 4); // A repeated confirmation never starts another role.
+        await f.tool("agent_recipes_invoke", {
+            recipe: recipeDraft.id,
+            target: "Review the branch",
+        });
+        assert.equal(f.startCalls, 4);
+        const recreated = await f.call("POST recipes", {
+            recipe: { ...parseRecipe(seeds[0]), revision: 0 },
+        });
+
+        assert.equal(recreated.recipe.revision, saved.revision + 1); // A deleted ID cannot reuse prior consent's revision.
+        const retained = await f.call("POST sources/:source/assistant/policy", {
+            revision: accepted.policy.revision,
+            enabled: false,
+            shared: [{ id: recipeDraft.id, revision: accepted.recipe.revision }],
+            grants: [],
+        });
+
+        assert.equal(retained.shared[0].title, "Accepted draft"); // Unrelated policy edits keep the older approved snapshot.
     } finally {
         await f.session.close(context);
     }
@@ -457,6 +655,87 @@ test("concurrent retries cannot race a start; cancel skips remaining roles, not 
         assert.equal(result.launch.state, "canceled");
         await f.retry();
         assert.equal(f.startCalls, 1);
+
+        const grant = { recipe: "review-branch", revision: 1, maxRuns: 1 };
+        const policy = {
+            enabled: true,
+            shared: [{ id: "review-branch", revision: 1 }],
+            grants: [grant],
+        };
+
+        await f.call("POST sources/:source/assistant/policy", { ...policy, revision: 0 });
+        let enteredAuto!: () => void;
+        let releaseAuto!: () => void;
+        const autoStarted = new Promise<void>((resolve) => {
+            enteredAuto = resolve;
+        });
+        const autoHeld = new Promise<void>((resolve) => {
+            releaseAuto = resolve;
+        });
+
+        f.beforeStart(async () => {
+            enteredAuto();
+            await autoHeld;
+        });
+        const args = { recipe: "Review branch", target: "Review once" };
+        const automatic = f.tool("agent_recipes_invoke", args, "automatic-call");
+
+        await autoStarted;
+        try {
+            await f.call("POST sources/:source/assistant/policy", {
+                ...policy,
+                enabled: false,
+                grants: [],
+                revision: 1,
+            });
+        } finally {
+            releaseAuto();
+        }
+        const autoResult = await automatic;
+
+        assert.equal(autoResult.launch.mode, "automatic");
+        assert.equal("requester" in autoResult.launch, false);
+        assert.equal("authorizer" in autoResult.launch, false);
+        const storedAuto = (await f.session.snapshot(Launches, f.source, context))!.launches.find(
+            (item) => item.mode === "automatic",
+        )!;
+
+        assert.equal(storedAuto.requester, "guest");
+        assert.equal(storedAuto.authorizer, "owner");
+        assert.equal(f.startCalls, 2); // Revocation cannot undo the one start already in flight.
+        assert.match(autoResult.launch.roles[1].error, /disabled, revoked/);
+        assert.match(f.children[1].message, /not an individual human approval/);
+        const reenabled = await f.call("POST sources/:source/assistant/policy", {
+            ...policy,
+            revision: 2,
+        });
+
+        assert.equal(reenabled.policy.grants[0].used, 1); // Remove/re-add does not refill consent.
+        assert.equal(
+            (await f.tool("agent_recipes_invoke", args, "second-call")).status,
+            "needs-owner-confirmation",
+        );
+        f.beforeStart(async () => {});
+        await f.tool("agent_recipes_invoke", args, "automatic-call");
+        await f.tool("agent_recipes_invoke", args, "automatic-call");
+        assert.equal(f.startCalls, 4); // Same call resumes only its two unstarted roles; no extra quota.
+        assert.deepEqual(f.actors, ["guest", "guest", "guest"]);
+        await f.call("POST sources/:source/assistant/policy", {
+            ...policy,
+            grants: [{ ...grant, maxRuns: 2 }],
+            revision: 3,
+        });
+        assert.equal(
+            (await f.tool("agent_recipes_invoke", args, "second-call")).status,
+            "needs-owner-confirmation",
+        ); // A pending call never upgrades itself after policy changes.
+        assert.equal(f.startCalls, 4);
+        f.requester("another-person");
+        await assert.rejects(
+            f.tool("agent_recipes_invoke", args, "automatic-call"),
+            /Run not found/,
+        );
+        assert.equal(f.startCalls, 4);
     } finally {
         release();
         await f.session.close(context);

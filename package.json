@@ -1,9 +1,9 @@
 {
     "name": "pi-pocket-agent-recipes",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "private": true,
     "type": "module",
-    "description": "Configurable owner-approved linked agent recipes for Pi Pocket",
+    "description": "Conversational agent recipes with owner review and scoped automatic runs for Pi Pocket",
     "license": "MIT",
     "scripts": {
         "check": "tsc --noEmit && tsc -p tsconfig.browser.json --noEmit && node --check agent-recipes/index.js",
