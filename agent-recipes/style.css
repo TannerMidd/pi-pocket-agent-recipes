@@ -1,217 +1,949 @@
 .ar-root {
+    width: 100%;
+    max-width: 1060px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    margin: 0 auto;
+    padding: 0 0 8px;
     color: var(--text);
     background: var(--bg);
-    padding: 20px 16px 48px;
-    max-width: 1120px;
-    margin: 0 auto;
+    font-size: 13px;
+    line-height: 1.45;
     overflow-wrap: anywhere;
-    line-height: 1.5;
 }
-.ar-root * {
+
+.ar-root *,
+.ar-root *::before,
+.ar-root *::after {
     box-sizing: border-box;
 }
-.ar-root h1 {
-    font-size: 28px;
-    margin: 0;
-    letter-spacing: -0.03em;
-}
-.ar-root h2 {
-    font-size: 19px;
-    margin: 0 0 12px;
-}
-.ar-root h3 {
-    font-size: 16px;
-    margin: 0 0 8px;
-}
+
+.ar-root h2,
+.ar-root h3,
+.ar-root h4,
 .ar-root p {
-    margin: 8px 0 16px;
-}
-.ar-header,
-.ar-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-.ar-header {
-    margin-bottom: 22px;
-}
-.ar-row {
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-}
-.ar-row h2 {
     margin: 0;
 }
-.ar-eyebrow {
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 0.12em;
-    font-weight: 700;
+
+.ar-root h2 {
+    font-size: 15px;
+    font-weight: 600;
 }
-.ar-muted {
-    color: var(--muted);
-    font-size: 13px;
-}
-.ar-panel {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 18px;
-    min-width: 0;
-}
-.ar-grid {
-    display: grid;
-    grid-template-columns: minmax(230px, 0.7fr) minmax(0, 1.5fr);
-    gap: 18px;
-    align-items: start;
-}
-.ar-root nav {
-    display: grid;
-    gap: 10px;
-    margin: 16px 0;
-}
-.ar-recipe {
-    cursor: pointer;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: var(--bg);
-    color: var(--text);
-    text-align: left;
-    padding: 14px;
-    min-height: 70px;
-    font: inherit;
-}
-.ar-recipe strong,
-.ar-recipe span {
-    display: block;
-}
-.ar-recipe span {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 5px;
-}
-.ar-recipe.is-selected {
-    border-color: var(--accent);
-    box-shadow: inset 3px 0 0 var(--accent);
-}
-.ar-root label {
-    display: block;
+
+.ar-root h3,
+.ar-root h4 {
     font-size: 13px;
     font-weight: 600;
-    margin: 14px 0;
 }
-.ar-root input,
-.ar-root textarea,
-.ar-root select {
-    display: block;
-    width: 100%;
+
+.ar-header,
+.ar-section-head,
+.ar-actions,
+.ar-role-foot,
+.ar-status-role-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     min-width: 0;
-    padding: 11px;
-    min-height: 44px;
+}
+
+.ar-header {
+    justify-content: space-between;
+    min-height: 36px;
+    margin-bottom: 8px;
+}
+
+.ar-tabs {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
     border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--bg);
-    color: var(--text);
+    border-radius: 6px;
+    background: var(--card);
+}
+
+.ar-tabs button {
+    border: 0;
+    border-radius: 3px;
+    padding: 5px 16px;
+    color: var(--muted);
+    background: transparent;
     font: inherit;
-    font-size: 16px;
-    line-height: 1.45;
-    margin-top: 6px;
+    font-weight: 550;
+    cursor: pointer;
 }
-.ar-root textarea {
-    resize: vertical;
+
+.ar-tabs button[aria-pressed="true"] {
+    color: var(--text);
+    background: var(--bg);
+    box-shadow: 0 0 0 1px var(--line);
 }
-.ar-root input:disabled {
-    opacity: 0.65;
+
+.ar-root .button {
+    min-height: 30px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font: inherit;
+    font-weight: 550;
+    line-height: 1.4;
+    white-space: nowrap;
 }
+
+.ar-root .ar-quiet {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+.ar-root .ar-danger {
+    color: var(--err);
+}
+
+.ar-root button:disabled,
+.ar-root select:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
 .ar-root button:focus-visible,
 .ar-root input:focus-visible,
 .ar-root textarea:focus-visible,
 .ar-root select:focus-visible,
 .ar-root summary:focus-visible {
     outline: 2px solid var(--accent);
-    outline-offset: 3px;
+    outline-offset: 2px;
 }
-.ar-root .button {
-    min-height: 44px;
-    white-space: normal;
+
+.ar-workspace {
+    display: grid;
+    grid-template-columns: minmax(200px, 245px) minmax(0, 1fr);
+    border-top: 1px solid var(--line);
+    flex: 1;
+    min-height: 0;
 }
-.ar-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+
+.ar-library {
+    min-width: 0;
+    border-right: 1px solid var(--line);
+    padding: 12px 12px 12px 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
 }
-.ar-root fieldset {
+
+.ar-library-tools {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.ar-library-tools > .button {
+    justify-self: start;
+}
+
+.ar-root label {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 550;
+}
+
+.ar-root label > .ar-muted {
+    display: contents;
+    font-weight: 400;
+}
+
+.ar-root input,
+.ar-root textarea,
+.ar-root select {
+    width: 100%;
+    min-width: 0;
+    min-height: 34px;
+    padding: 6px 8px;
     border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 12px;
-    margin: 18px 0;
+    border-radius: 5px;
+    background: var(--bg);
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.ar-root input::placeholder,
+.ar-root textarea::placeholder {
+    color: var(--muted);
+}
+
+.ar-root textarea {
+    display: block;
+    resize: vertical;
+}
+
+.ar-root select {
+    text-overflow: ellipsis;
+}
+
+.ar-root .ar-search input {
+    background: var(--card);
+}
+
+.ar-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.ar-item {
+    flex: none;
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 9px 10px;
+    border: 0;
+    border-left: 2px solid transparent;
+    border-radius: 0 4px 4px 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ar-item.is-selected {
+    background: var(--card);
+    border-left-color: var(--accent);
+}
+
+.ar-item strong,
+.ar-item span,
+.ar-item small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ar-item strong {
+    font-size: 13px;
+    font-weight: 550;
+}
+
+.ar-item span,
+.ar-item small {
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.ar-editor,
+.ar-run-detail {
+    min-width: 0;
+    padding: 12px 0 0 20px;
+}
+
+.ar-pane {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scroll-padding-top: 12px;
+}
+
+.ar-section-head {
+    margin-bottom: 14px;
+    min-height: 30px;
+}
+
+.ar-section-head h2 {
+    flex: 1;
     min-width: 0;
 }
-.ar-root legend {
-    color: var(--accent);
-    padding: 0 6px;
-    font-weight: 600;
+
+.ar-save-state {
+    color: var(--muted);
+    font-size: 11px;
 }
+
+.ar-recipe-tools {
+    gap: 0;
+}
+
+.ar-root .ar-fields {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.ar-fields > label + label {
+    margin-top: 14px;
+}
+
+.ar-recipe-fields,
+.ar-model-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(120px, 1fr);
+    gap: 10px;
+}
+
+.ar-model-fields {
+    margin: 12px 0;
+}
+
+.ar-root .ar-field-error {
+    color: var(--err);
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.ar-model-fields .ar-field-error {
+    grid-column: 1 / -1;
+    margin-top: -3px;
+}
+
+.ar-root .ar-mode-note {
+    color: var(--muted);
+    font-size: 11px;
+    margin: 10px 0 18px;
+    max-width: 68ch;
+}
+
+.ar-roles-head {
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.ar-roles-head h3 span {
+    padding-left: 4px;
+    font-weight: 400;
+}
+
 .ar-role {
+    border-top: 1px solid var(--line);
+}
+
+.ar-role:last-child {
+    border-bottom: 1px solid var(--line);
+}
+
+.ar-role-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    min-height: 56px;
+    padding: 10px 2px;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ar-role-head > span:nth-child(2) {
+    min-width: 0;
+    flex: 1;
+}
+
+.ar-role-head strong,
+.ar-role-head small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ar-role-head strong {
+    font-size: 13px;
+    font-weight: 550;
+}
+
+.ar-role-head small {
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.ar-role-number {
+    color: var(--muted);
+    font-size: 11px;
+    width: 16px;
+    flex-shrink: 0;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.ar-chevron {
+    color: var(--muted);
+    font-size: 18px;
+    font-weight: 400;
+    margin-left: auto;
+}
+
+.ar-role-body {
+    padding: 2px 0 12px 28px;
+}
+
+.ar-role-foot {
+    justify-content: space-between;
+    margin-top: 5px;
+}
+
+.ar-editor-footer,
+.ar-run-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 0 8px;
+    background: var(--bg);
+}
+
+.ar-editor-footer > .ar-muted {
+    font-size: 11px;
+}
+
+.ar-root .ar-muted,
+.ar-label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.ar-label {
+    display: block;
+    font-size: 11px;
+    margin-bottom: 3px;
+}
+
+.ar-alert,
+.ar-notice,
+.ar-conflict,
+.ar-pending-note {
+    margin: 0 0 12px;
+    padding: 8px 10px;
+    border-left: 2px solid var(--err);
+    background: var(--card);
+    font-size: 12px;
+}
+
+.ar-alert {
+    color: var(--err);
+}
+
+.ar-notice {
+    border-left-color: var(--ok);
+}
+
+.ar-conflict,
+.ar-pending-note {
+    border-left-color: var(--warn);
+}
+
+.ar-conflict {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.ar-empty {
+    padding: 20px 10px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.ar-empty .button {
+    margin-top: 12px;
+}
+
+.ar-source-hint {
+    margin-top: 8px;
+}
+
+.ar-run-form {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    max-width: 680px;
+    margin: 0 auto;
     padding: 14px 0;
     border-top: 1px solid var(--line);
 }
-.ar-role p {
-    font-size: 14px;
+
+.ar-source {
+    padding: 0 0 14px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--line);
 }
-.ar-note {
-    border-left: 3px solid var(--warn);
-    padding-left: 12px;
+
+.ar-source strong,
+.ar-source small,
+.ar-path {
+    display: block;
+}
+
+.ar-source strong,
+.ar-runs-source strong {
     font-size: 13px;
+    font-weight: 550;
 }
-.ar-error {
-    color: var(--err);
-    padding: 10px;
-    border: 1px solid var(--err);
-    border-radius: 8px;
-    font-size: 13px;
+
+.ar-source small {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 5px;
 }
-.ar-copy {
-    padding: 10px 0;
-}
-.ar-copy textarea,
-.ar-id {
+
+.ar-path {
+    color: var(--muted);
     font-family: ui-monospace, monospace;
-    font-weight: 400;
-    font-size: 13px;
+    font-size: 11px;
+    margin-top: 2px;
+    overflow-wrap: anywhere;
 }
-.ar-launch-flow {
+
+.ar-run-form > .ar-fields > label,
+.ar-run-form > .ar-fields > .ar-fields {
+    margin-top: 14px;
+}
+
+.ar-run-roles-title {
+    margin: 18px 0 8px;
+}
+
+.ar-run-role {
     border-top: 1px solid var(--line);
-    margin-top: 22px;
-    padding-top: 18px;
 }
-.ar-root details {
-    margin: 18px 0;
-    font-size: 13px;
+
+.ar-run-role:last-child {
+    border-bottom: 1px solid var(--line);
 }
-.ar-root summary {
+
+.ar-run-role > summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 56px;
+    padding: 9px 2px;
     cursor: pointer;
-    min-height: 44px;
-    padding: 10px 0;
-    color: var(--accent);
+    list-style: none;
 }
-.ar-root li {
-    margin: 8px 0;
+
+.ar-run-role > summary::-webkit-details-marker {
+    display: none;
 }
-@media (max-width: 700px) {
+
+.ar-run-role-summary {
+    flex: 1;
+    min-width: 0;
+}
+
+.ar-run-role-summary strong,
+.ar-run-role-summary small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ar-run-role-summary strong {
+    font-size: 13px;
+    font-weight: 550;
+}
+
+.ar-run-role-summary small {
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.ar-needs-setup {
+    flex-shrink: 0;
+    color: var(--warn);
+    font-size: 11px;
+}
+
+.ar-run-role[open] > summary .ar-chevron {
+    transform: rotate(90deg);
+}
+
+.ar-run-role > .ar-model-fields {
+    margin: 0 0 12px;
+    padding-left: 12px;
+}
+
+.ar-approval-note {
+    padding-top: 2px;
+}
+
+.ar-runs {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.ar-runs-source {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-top: 1px solid var(--line);
+    padding: 12px 0;
+}
+
+.ar-runs-source > .ar-muted {
+    font-size: 11px;
+}
+
+.ar-runs-workspace {
+    min-height: 0;
+}
+
+.ar-status {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.ar-run-target,
+.ar-context p {
+    white-space: pre-wrap;
+}
+
+.ar-run-target {
+    margin-bottom: 10px;
+}
+
+.ar-context {
+    margin: 10px 0;
+}
+
+.ar-context summary {
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.ar-context p {
+    padding: 8px 0;
+}
+
+.ar-run-role-list {
+    margin-top: 14px;
+}
+
+.ar-status-role {
+    border-top: 1px solid var(--line);
+    padding: 12px 0;
+}
+
+.ar-status-role-head {
+    justify-content: space-between;
+}
+
+.ar-status-role-head strong {
+    font-weight: 550;
+}
+
+.ar-status-role p {
+    margin-top: 4px;
+}
+
+.ar-status-role .button {
+    margin-top: 8px;
+}
+
+.ar-run-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-top: 1px solid var(--line);
+    padding: 12px 0 8px;
+}
+
+.ar-mobile-back,
+.ar-mobile-role-head,
+.ar-mobile-role-done {
+    display: none;
+}
+
+.ar-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+@media (hover: hover) {
+    .ar-item:not(:disabled):hover,
+    .ar-role-head:not(:disabled):hover,
+    .ar-root .ar-quiet:not(:disabled):hover {
+        background: var(--card);
+    }
+}
+
+@media (max-width: 699px) {
     .ar-root {
-        padding: 16px 12px 36px;
+        padding: 0 0 8px;
+        font-size: 14px;
     }
-    .ar-grid {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 0;
-    }
-    .ar-panel {
-        padding: 14px;
-    }
+
     .ar-header {
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+    }
+
+    .ar-header > .ar-actions {
+        margin-left: auto;
+    }
+
+    .ar-root .button,
+    .ar-tabs button {
+        min-height: 40px;
+        padding: 8px 11px;
+    }
+
+    .ar-tabs button {
+        min-height: 32px;
+        padding: 5px 18px;
+    }
+
+    .ar-root input,
+    .ar-root select,
+    .ar-root textarea {
+        min-height: 42px;
+        padding: 8px 9px;
+        font-size: 16px;
+    }
+
+    .ar-root label {
+        font-size: 12px;
+    }
+
+    .ar-workspace {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .ar-library,
+    .ar-pane {
+        flex: 1;
+        min-height: 0;
+    }
+
+    .ar-library {
+        border: 0;
+        padding: 12px 0;
+    }
+
+    .ar-library-tools {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .ar-library-tools > .ar-muted {
+        grid-column: 1 / -1;
+    }
+
+    .ar-item {
+        min-height: 59px;
+        padding: 10px 9px;
+        border-radius: 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .ar-item strong {
+        font-size: 14px;
+    }
+
+    .ar-item span,
+    .ar-item small {
+        font-size: 12px;
+    }
+
+    .ar-editor,
+    .ar-run-detail {
+        padding: 10px 0 0;
+    }
+
+    .ar-screen-library .ar-editor,
+    .ar-screen-library .ar-run-detail,
+    .ar-screen-editor .ar-library,
+    .ar-screen-role .ar-library,
+    .ar-screen-run-detail .ar-library {
+        display: none;
+    }
+
+    .ar-mobile-back {
+        display: inline-flex;
+        padding-left: 0;
+    }
+
+    .ar-section-head {
+        gap: 4px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+
+    .ar-editor-summary > .ar-section-head > h2 {
+        display: none;
+    }
+
+    .ar-save-state {
+        margin-left: auto;
+    }
+
+    .ar-recipe-tools {
+        margin-left: auto;
+    }
+
+    .ar-root .ar-recipe-tools .button {
+        padding-right: 6px;
+        padding-left: 6px;
+        font-size: 12px;
+    }
+
+    .ar-recipe-fields {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .ar-root .ar-mode-note {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+
+    .ar-role-head {
+        min-height: 62px;
+        padding: 10px 2px;
+    }
+
+    .ar-role-head strong {
+        font-size: 14px;
+    }
+
+    .ar-role-head small {
+        font-size: 12px;
+    }
+
+    .ar-screen-editor .ar-role-body {
+        display: none;
+    }
+
+    .ar-screen-role .ar-editor-summary,
+    .ar-screen-role .ar-role-head,
+    .ar-screen-role .ar-role:not(.is-open),
+    .ar-screen-role .ar-editor-footer,
+    .ar-screen-role .ar-source-hint,
+    .ar-screen-role .ar-editor > .ar-field-error {
+        display: none;
+    }
+
+    .ar-screen-role .ar-role {
+        border: 0;
+    }
+
+    .ar-role-body {
+        padding: 0;
+    }
+
+    .ar-mobile-role-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 12px;
+    }
+
+    .ar-mobile-role-head .button {
+        padding-left: 0;
+    }
+
+    .ar-screen-role .ar-mobile-role-done {
+        display: flex;
+        justify-content: end;
+        padding-top: 12px;
+    }
+
+    .ar-editor-footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 1;
+        border-top: 1px solid var(--line);
+        padding: 12px 0 max(8px, env(safe-area-inset-bottom));
+    }
+
+    .ar-editor-footer > .ar-muted {
+        width: 100%;
+    }
+
+    .ar-editor-footer > .ar-actions {
+        width: 100%;
+        justify-content: end;
+        gap: 6px;
+    }
+
+    .ar-model-fields {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .ar-model-fields .ar-field-error {
+        margin-top: -4px;
+    }
+
+    .ar-run-form {
+        padding-top: 10px;
+        padding-bottom: 0;
+    }
+
+    .ar-run-form > .ar-section-head {
+        flex-wrap: nowrap;
         align-items: start;
+    }
+
+    .ar-run-form > .ar-section-head h2 {
+        padding-top: 10px;
+    }
+
+    .ar-run-footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 1;
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+        border-top: 1px solid var(--line);
+    }
+
+    .ar-run-detail > .ar-section-head .ar-status {
+        width: 100%;
+    }
+
+    .ar-status-role-head {
+        flex-wrap: wrap;
+        align-items: start;
+    }
+}
+
+@media (pointer: coarse) {
+    .ar-root input,
+    .ar-root textarea,
+    .ar-root select {
+        font-size: 16px;
     }
 }

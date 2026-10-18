@@ -1,89 +1,71 @@
 # Agent recipes for Pi Pocket
 
-Save read-only team briefs, preview each role and model, and approve a linked team in a source session. No external service is needed to save recipes or build requests. Starting a team uses the model providers already set in Pocket.
+Save reusable role briefs, configure models and thinking, and start a linked team directly from an owner-approved run preview.
 
-**Version:** 0.1.0. It needs Pi Pocket 0.14 or later, extension API 1, and the **experimental** public `host.linkedSessions` API. The module checks that the API exists. A future Pocket minor release can change this experimental API.
+**Version 0.2.0 · Requires Pi Pocket 0.16 or later, extension API 1.** Uses public conversation routes and human-bound linked sessions. The optional model status tool uses the experimental host list API; its absence does not disable the page. On older servers, the page shows an update notice and disables changes and starts.
 
 ## Install
 
-1. In Pocket, open **Menu → Extensions**. Review the full module and its browser files before you turn it on.
-2. For a manual install, copy `agent-recipes.ts` and the complete `agent-recipes/` folder into the `extensions/` folder of your Pocket data folder. The default is `~/.pi-pocket/extensions/`. If you set `PI_POCKET_DIR`, use its `extensions/` folder instead. Do not copy tests, development dependencies, or this repository's `node_modules` link.
-3. In **Menu → Extensions**, turn on **Agent recipes**. It starts off, like other drop-ins.
-4. Select the source session. As the owner, send `/agent-recipes-sync` there.
-5. Open **Menu → Agent recipes**, then tap **Refresh**. The rail and launcher also have an Agent recipes action.
+1. Review `agent-recipes.ts` and the complete `agent-recipes/` folder. A drop-in runs with the server owner's rights.
+2. Copy those files into the `extensions/` folder of your Pocket data folder (normally `~/.pi-pocket/extensions/`). Do not copy this repository's tests, development dependencies, or `node_modules` link.
+3. Open **Menu → Extensions** and turn on **Agent recipes**. Then use **Menu → Agent recipes**, its rail button, or the launcher.
 
-No install or restart is automatic. When you update `agent-recipes/domain.ts` or another imported server helper, use **Menu → Restart server** after you put the files in place. Node caches these helper files. A root module reload alone is not enough. Review and test an update before you use it on a live server.
-
-The extension does not install itself or change Pocket core. Review the source before installation.
+No install or restart is automatic. After you update an imported server helper such as `agent-recipes/domain.ts`, use **Menu → Restart server**: Node caches imported helpers. Test updates on an isolated server first.
 
 ## Use
 
-### Save a recipe
+### Recipes
 
-The library starts with three recipes, each with distinct roles:
+The library includes **Review branch**, **Investigate regression**, and **Prepare release**. Select a recipe to edit it, or choose **New recipe**. Set its name, work mode, and 1–4 roles. Each role has a name, brief, default model, and default thinking level. Empty model and thinking choices inherit the selected source session at approval time.
 
-- **Review branch:** correctness, security, and coverage review.
-- **Investigate regression:** code-path tracing, local history, and reproduction planning.
-- **Prepare release:** readiness review, release notes draft, and a verification plan.
+Choose **Save recipe** to save directly. Saves do not require a selected session or its turn. You can duplicate or delete recipes from the library. Stale edits and deletes are rejected; a save conflict keeps your draft so you can load the latest version. Deleting a recipe does not change existing runs.
 
-Select a recipe and tap **Edit selected recipe**, or tap **New recipe**. Set its identifier, title, and 1–4 read-only role briefs. Tap **Build save command**. Copy the command into an owner session and send it. Return to Agent recipes, close the editor, and tap **Refresh**.
+### Start a run
 
-The command, not the page, saves the data. Edits left only in the page are not saved. A revision check rejects stale edits. There is room for 20 recipes; this version does not delete recipes.
+1. Select the source session in Pocket. Choose a saved recipe and **Run…**.
+2. Check the source name and folder. Enter the required task and optional context. These fields and the role briefs go to the linked sessions and their model providers; do not include secrets.
+3. Check the work mode and every role's effective model and thinking. Choices come from the source model and **Menu → Providers → Models for subagents**. A missing or unsupported choice must be changed explicitly; it is never silently replaced or lowered.
+4. Choose **Start run**. This is the owner's approval and starts the saved snapshot directly. No command copying or agent mediation is needed.
 
-### Approve and launch a team
+The preview stays bound to its source. If the source model, thinking, or folder changes before approval, refresh the preview. Approval records exact effective choices, role briefs, task, context, and work mode. Later recipe edits do not change them. Each remaining start checks current model permission, availability, thinking support, and the source thinking limit again. A changed source folder blocks pending starts until the approved folder is restored.
 
-1. Select the source session and run `/agent-recipes-sync` there. Open Agent recipes and tap **Refresh**. The selected session must match the last synced source; otherwise launch generation is blocked.
-2. Select a saved recipe. Enter a **Target** and optional **Context**. Do not put secrets in these fields. They go into linked sessions and to model providers.
-3. For each role, explicitly choose an owner-allowed model, or keep **Use source session model (omit model)**. Extra choices come only from **Menu → Providers → Models for subagents**. The source-model option sends no `model` override.
-4. Read the preview and tap **Build launch request**.
-5. Copy the **Approval command** into the source session and send it as the owner. It saves an immutable, session-scoped approval with the recipe revision, role briefs, target, context, chosen models, owner ID, and per-role start keys.
-6. Copy the **Launch message** and send it as a **new message in that same source session**. Pi can now call `agent_recipes_launch` with that launch ID. A command's toast is not sent to Pi, so this second message is required.
+### Runs and recovery
 
-The page never launches a session itself. Clipboard access can fail on plain LAN HTTP. Each copy box also has selectable text. Identifiers use `crypto.getRandomValues`, which works on plain HTTP; they do not require `crypto.randomUUID`.
+Open **Runs** to inspect runs for the selected source. **Refresh** gives a status snapshot, not continuous monitoring. **Open session** opens a visible linked role. A started or idle session does **not** mean its task is complete. Pocket can withhold session metadata; the page does not invent it.
 
-All roles receive an explicit read-only brief. They must report once, then stop. Publishing, deployment, merging, commits, pushes, and public comments need a **separate explicit owner request outside this recipe**. Prepare release drafts text; it does not make a release.
+Use **Retry safe remaining** after a partial start. It keeps the same launch ID and immutable snapshot and skips confirmed starts. Never make a replacement run to recover an uncertain start. Identical network reposts return the original run; a changed payload under the same ID is rejected.
 
-### Status, retry, and revoke
+**Cancel pending starts** prevents further starts when cancellation is observed. It does not stop existing sessions. A start already in flight can still create a session after you cancel. Use Pocket's normal session controls to stop sessions that were created.
 
-- Run `/agent-recipes-sync` in the source session, then tap **Refresh**, to load that session's saved launch progress.
-- Ask Pi to use `agent_recipes_status` in the source session, then tap **Refresh**, for a linked team activity snapshot. This uses only public `linkedSessions.list`. Pocket can withhold titles and activity fields. There is no automatic polling or autonomous loop.
-- On a partial failure, use the **same launch ID**. Never build a new launch to retry an existing team. Completed roles are skipped. Errors can be caused by plan mode, turn-taking, spend limits, unavailable models, or team limits.
-- An approval permits starts for 24 hours. After that it fails closed. Do not assume that an old launch did nothing.
-- Send `/agent-recipes-cancel <launch ID>` to revoke future starts. This does **not** stop sessions that already started. Use Pocket's normal session controls to stop them. There is no public linked-session stop API used here.
+Starts can fail because of plan mode, turn-taking, spending limits, model availability, or team limits. The retry window is 24 hours. After that, inspect the existing sessions rather than assume the run did nothing.
 
-Before each side effect, the module records its role key, attempt time, and the visible linked-address baseline. The host normally deduplicates the start key. Its documented retention is 30 days and the last 1,000 calls per source; the shorter 24-hour window alone does not protect against count eviction.
+Before each start, the module stores the role's stable key, attempt time, and visible linked-address baseline. It stores the result separately, never inside the start transaction. After a lost response or result commit, retry first reconciles the role's frozen title through the public linked-session list. New runs use readable titles with unique run and role numbers; old approvals keep their hashed titles. A proved match is recorded without another start; its initial message can still be unconfirmed. Renamed, hidden, missing, or ambiguous sessions fail closed. Do not rename or delete linked sessions during recovery. Host receipts and module documents remain authoritative; the in-flight guard is not a durable queue.
 
-For an unconfirmed start, the module first uses the public list API to reconcile a stable, role-specific title. If the session exists, it records that address **without another start**. The first message may still be unconfirmed; inspect the session. If the team gained an address with a changed or withheld title, or a baseline is unavailable, retry fails closed. If the visible team has no new addresses, the module can safely retry the same key. It never silently creates a replacement team to resolve uncertainty. Do not delete or rename linked sessions during recovery; doing so can make reconciliation incomplete. No extension can promise idempotency after someone deletes its stored data or changes the server's guarantees.
+## Configuration and limits
 
-## Access and data
+- **Read-only** tells roles not to edit files or change state. **Allow local edits** permits task-related edits and tests inside the source folder. Existing saved briefs keep their own restrictions; changing mode does not rewrite them.
+- Work modes are **instruction policy, not a sandbox**. All roles use the **same working folder**, not separate worktrees. Coordinate shared files. Writes outside that folder, commits, merges, pushes, publication, deployment, and public comments need separate explicit owner authorization outside the recipe.
+- Models and thinking can be set per recipe role or overridden per run. Unavailable saved defaults remain saved and visible. Launches reject unsupported inherited thinking and ask for an explicit supported level.
+- Limits: 20 recipes, 1–4 roles each, 30 saved runs per source; recipe name 60 characters, role name 40, role brief 5,000, task 2,000, context 6,000. Pocket's own linked-session limits remain authoritative.
 
-- **Owner-only UI and routes.** Guests and viewers, including people invited to one session, cannot read this module's catalog or UI cache through its routes. Every route uses the normal Pocket authentication and `X-Pocket` check through `pocket.api`.
-- All four commands have `scope: "global"` and check the owner's role again. Launch approval must be a human command. A model cannot approve itself with the launch tool.
-- `agent_recipes_launch` reads only its current session's approval document. The active requester must match the owner who approved it. It cannot take an arbitrary session ID or working directory. Approvals are not copied into forks.
-- `agent_recipes_status` can be called by agents in their current session. The host applies the active requester's linked-session visibility rules. It reads no global recipe document. Tool results are fenced and labeled as untrusted data.
-- Recipe documents use `x.agent-recipes.catalog` (Pi Durable **session scope**, meaning the whole Pocket store). Per-conversation approvals and progress use `x.agent-recipes.launches` (`history: latest`, `fork: initial`). These names and semantics are stable storage contracts.
-- These documents are stored by Pocket in its normal database. Turning the module off or uninstalling its files does not erase them. There is no automatic data cleanup. There is room for 30 approvals per source session, including revoked approvals; use a new source session for new teams after that.
-- Routes have **no public document reader, commit API, session resolver, or working directory**. The host has no public database handle. Therefore `/agent-recipes-sync` explicitly copies authorized document snapshots into an owner-keyed, read-only in-memory UI cache. Saves and approvals refresh that cache too. A reload or restart clears the cache, not the documents; sync again. There is no file-store workaround and no private API call.
-- The UI cache shows only the last synced source, not an unrelated session. It can become stale until you refresh or sync. Status is a snapshot, not a live monitor. It does not contain source transcripts.
-- No filesystem reads, subprocesses, direct network calls, tokens, sign-ins, or arbitrary shell commands are used by this extension. Its runtime imports are bundled helpers, Node's `crypto`, and Pocket-supplied packages. `_pocket.d.ts` is an editor-only copy of the public types; it is not a runtime import.
+## Security and stored data
 
-## Security and limits
+The UI and all routes are owner-only. Routes use Pocket authentication and its `X-Pocket` check through `pocket.api`. Source routes bind an explicitly selected conversation and start/list as the signed-in person, not the source agent's last requester. Pocket checks source visibility, steering rights, turn-taking, plan mode, spend, and linked-session limits. Library changes are global owner actions and do not need a source.
 
-A drop-in runs in the Pocket server with the owner's rights. It is **not a sandbox**. The browser part runs with the signed-in owner's rights. Review all code before enabling it.
+Only the owner-bound human routes approve or start runs. There is no model-start or self-approval tool, and old approvals remain recoverable through Runs. The read-only `agent_recipes_status` tool only lists visible linked sessions in its own source. Model-facing results are fenced as untrusted data.
 
-Linked sessions are ordinary agents. **Every linked role uses the source session's working directory, NOT a separate worktree.** They receive copied source agent settings, but not source history, plan mode, or a separate spending budget. Read-only role prompts are guidance only; the linked agents still have their normal tools. Do not use these recipes as a security boundary.
+Stored document contracts are unchanged:
 
-The host enforces source access, right to steer, plan mode, turn-taking, spending limits, allowed models, and linkage limits. This module does not weaken them. Linked sessions cannot start another team. The current Pocket host permits at most 10 starts per source and limits inter-agent messages; the host remains authoritative if these limits change. This extension does not relay messages, raise budgets, raise thinking levels, start autonomous loops, edit files, or publish anything.
+- `x.agent-recipes.catalog`: session scope (the whole Pocket store).
+- `x.agent-recipes.launches`: conversation scope, `history: latest`, `fork: initial`. Forks do not inherit approval.
 
-The owner's allowed-model choices are checked at approval and again before a start. Revoking an allowed model blocks a later start. An explicit source-model ID is not offered as a bypass: use the omission option for the source's model. The host checks current model availability.
+Old recipes normalize to read-only with inherited choices without changing stored data on a read. Existing launch IDs, role IDs, start keys, and legacy `models[]` records remain usable. Turning the module off or removing its files does not erase its documents. No automatic cleanup is performed.
 
-Do not use secret prompts or private context in a session shared with other people. Tool calls and results are visible to the people who can read that source session; normal linked-session visibility rules also apply. The document namespace prevents collisions, not access by other server extensions or the owner's shell.
+The module reads no outside files, transcripts, database handles, tokens, or sign-ins. It starts no subprocesses and makes no direct network requests. It uses only public Pocket APIs and its own durable documents; there is no command-context cache or private endpoint workflow. Normal linked agents can still use their configured tools and providers. Other server extensions and the owner's shell can read document data; namespacing is not isolation.
 
-## Develop and test
+## Development
 
-Use Node 24 or later and an independent checkout. No build output is needed; Pocket runs TypeScript with Node's type stripping.
-
-Portable setup:
+Use Node 24 or later and an independent checkout:
 
 ```sh
 npm install
@@ -91,15 +73,13 @@ npm run check
 npm test
 ```
 
-`npm run check` checks the actual server files, public type declarations, tests, and browser JavaScript imports. The server is strict TypeScript. Browser JavaScript uses `checkJs` with relaxed implicit parameter and null inference. It also runs `node --check` on the browser entry. `npm test` uses real Pi Durable in-memory documents and fake public linked-session services. No model provider, Pocket source import, owner data, live server, or browser is needed.
+Pocket runs the TypeScript directly; there is no build output. `_pocket.d.ts` is an editor-only copy of Pocket's public API. It is not a runtime import. A gitignored `node_modules` symlink to a compatible Pocket checkout is convenient for local development, but must not be shipped.
 
-The five focused tests cover approval access boundaries, revoked models, recovery after a successful start with a lost result commit and an evicted host receipt, changed-title uncertainty, and stale recipe edits across a module reload. They do not claim a full real-provider or real-browser integration test.
+The server tests use real Pi Durable in-memory documents with fake public host and request-bound linked-session services. They cover owner/source boundaries, immutable approval and revision conflicts, current model/thinking/folder checks, uncertain-start recovery, concurrent retry/cancellation, and legacy records. They require no model provider, browser, live installation, or owner data. They do not replace integration tests against a compatible Pocket server. Use an isolated temporary data directory for those checks, never the owner's live data.
 
-For local development beside a compatible Pocket checkout, you may replace a local install with a gitignored `node_modules` symlink to that checkout's `node_modules`. This repository currently uses that convenience link. It is not an installation dependency and must not be shipped. The package versions in `package.json` give the portable development dependencies.
+## Distribution
 
-For a browser test, use a separate Pocket test server and a temporary data directory, not the owner's live install. Copy only the module and its folder to that test server's extension directory. Do not set `PI_POCKET_DIR` to a live data folder. Review desktop and mobile layouts, clipboard fallback, the sync/source mismatch warning, recipe save, and the two-step approval flow. A scripted echo model does not call the launch tool; use a scripted tool-calling model for that check. A manual smoke test on an isolated Pocket 0.15 copy checked desktop/mobile layout, sync, approval-request generation, and an approved three-role launch through the real public linked-session service. No real model provider was used. Separate HTTP checks confirmed that guests and viewers cannot reach the route.
-
-## Files for a gallery entry
+Install only these runtime files:
 
 ```text
 agent-recipes.ts
@@ -108,7 +88,7 @@ agent-recipes/index.js
 agent-recipes/style.css
 ```
 
-The module has the required root name and a single namespaced support folder. It imports no Pocket source code or machine-specific runtime path. Tests, documentation, development files, and `_pocket.d.ts` need not be installed. Source: [TannerMidd/pi-pocket-agent-recipes](https://github.com/TannerMidd/pi-pocket-agent-recipes). Gallery installation becomes available after its index entry is reviewed and merged. For later updates, **Menu → Extensions → Share…** can generate an entry from the installed files.
+Source: [TannerMidd/pi-pocket-agent-recipes](https://github.com/TannerMidd/pi-pocket-agent-recipes). Gallery availability depends on a reviewed index entry. **Menu → Extensions → Share…** can prepare an entry from an installed copy.
 
 ## License
 
