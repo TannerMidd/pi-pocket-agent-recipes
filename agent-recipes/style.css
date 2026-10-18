@@ -1,0 +1,217 @@
+.ar-root {
+    color: var(--text);
+    background: var(--bg);
+    padding: 20px 16px 48px;
+    max-width: 1120px;
+    margin: 0 auto;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+}
+.ar-root * {
+    box-sizing: border-box;
+}
+.ar-root h1 {
+    font-size: 28px;
+    margin: 0;
+    letter-spacing: -0.03em;
+}
+.ar-root h2 {
+    font-size: 19px;
+    margin: 0 0 12px;
+}
+.ar-root h3 {
+    font-size: 16px;
+    margin: 0 0 8px;
+}
+.ar-root p {
+    margin: 8px 0 16px;
+}
+.ar-header,
+.ar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.ar-header {
+    margin-bottom: 22px;
+}
+.ar-row {
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+.ar-row h2 {
+    margin: 0;
+}
+.ar-eyebrow {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    font-weight: 700;
+}
+.ar-muted {
+    color: var(--muted);
+    font-size: 13px;
+}
+.ar-panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 18px;
+    min-width: 0;
+}
+.ar-grid {
+    display: grid;
+    grid-template-columns: minmax(230px, 0.7fr) minmax(0, 1.5fr);
+    gap: 18px;
+    align-items: start;
+}
+.ar-root nav {
+    display: grid;
+    gap: 10px;
+    margin: 16px 0;
+}
+.ar-recipe {
+    cursor: pointer;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    text-align: left;
+    padding: 14px;
+    min-height: 70px;
+    font: inherit;
+}
+.ar-recipe strong,
+.ar-recipe span {
+    display: block;
+}
+.ar-recipe span {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+}
+.ar-recipe.is-selected {
+    border-color: var(--accent);
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+.ar-root label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 14px 0;
+}
+.ar-root input,
+.ar-root textarea,
+.ar-root select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 11px;
+    min-height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.45;
+    margin-top: 6px;
+}
+.ar-root textarea {
+    resize: vertical;
+}
+.ar-root input:disabled {
+    opacity: 0.65;
+}
+.ar-root button:focus-visible,
+.ar-root input:focus-visible,
+.ar-root textarea:focus-visible,
+.ar-root select:focus-visible,
+.ar-root summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+.ar-root .button {
+    min-height: 44px;
+    white-space: normal;
+}
+.ar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.ar-root fieldset {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+    margin: 18px 0;
+    min-width: 0;
+}
+.ar-root legend {
+    color: var(--accent);
+    padding: 0 6px;
+    font-weight: 600;
+}
+.ar-role {
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+}
+.ar-role p {
+    font-size: 14px;
+}
+.ar-note {
+    border-left: 3px solid var(--warn);
+    padding-left: 12px;
+    font-size: 13px;
+}
+.ar-error {
+    color: var(--err);
+    padding: 10px;
+    border: 1px solid var(--err);
+    border-radius: 8px;
+    font-size: 13px;
+}
+.ar-copy {
+    padding: 10px 0;
+}
+.ar-copy textarea,
+.ar-id {
+    font-family: ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 13px;
+}
+.ar-launch-flow {
+    border-top: 1px solid var(--line);
+    margin-top: 22px;
+    padding-top: 18px;
+}
+.ar-root details {
+    margin: 18px 0;
+    font-size: 13px;
+}
+.ar-root summary {
+    cursor: pointer;
+    min-height: 44px;
+    padding: 10px 0;
+    color: var(--accent);
+}
+.ar-root li {
+    margin: 8px 0;
+}
+@media (max-width: 700px) {
+    .ar-root {
+        padding: 16px 12px 36px;
+    }
+    .ar-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+    }
+    .ar-panel {
+        padding: 14px;
+    }
+    .ar-header {
+        align-items: start;
+    }
+}
